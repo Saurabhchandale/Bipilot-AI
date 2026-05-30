@@ -269,6 +269,13 @@ input[type="file"]::file-selector-button {
     margin-bottom: 24px;
 }
 
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -482,6 +489,16 @@ input[type="file"]::file-selector-button {
     .result-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .result-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .result-actions .primary-button,
+    .result-actions .secondary-button {
+        flex: 1 1 180px;
     }
 
     .summary-list {

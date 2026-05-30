@@ -15,6 +15,7 @@ class Config:
 
     SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key")
     UPLOAD_FOLDER = BASE_DIR / "datasets"
+    EXPORT_FOLDER = BASE_DIR / "exports"
     DATABASE_PATH = BASE_DIR / "database" / "bipilot_ai.sqlite3"
     MAX_CONTENT_LENGTH = 25 * 1024 * 1024
     ALLOWED_EXTENSIONS = {"csv", "xls", "xlsx"}

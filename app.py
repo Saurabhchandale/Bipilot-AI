@@ -1,4 +1,7 @@
-from flask import Flask, flash, redirect, render_template, request, url_for
+from datetime import datetime
+
+from flask import Flask, flash, redirect, render_template, request, send_from_directory, url_for
+from werkzeug.utils import secure_filename
 
 from ai_engine import AIInsightGenerator
 from chart_engine import ChartRecommender, PlotlyChartGenerator
@@ -11,6 +14,7 @@ from dataset_engine import (
     DatasetTypeDetector,
 )
 from dataset_engine.loader import DatasetLoadError
+from export_engine import ExcelReportExporter
 
 
 def create_app(config_object=DevelopmentConfig):
@@ -20,6 +24,7 @@ def create_app(config_object=DevelopmentConfig):
     app.config.from_object(config_object)
 
     app.config["UPLOAD_FOLDER"].mkdir(parents=True, exist_ok=True)
+    app.config["EXPORT_FOLDER"].mkdir(parents=True, exist_ok=True)
     app.config["DATABASE_PATH"].parent.mkdir(parents=True, exist_ok=True)
 
     @app.get("/")
@@ -58,6 +63,20 @@ def create_app(config_object=DevelopmentConfig):
                 cleaning_summary=cleaning_summary,
                 chart_specs=chart_specs,
             )
+
+            export_filename = self_contained_export_name(saved_path.name)
+            export_path = app.config["EXPORT_FOLDER"] / export_filename
+            ExcelReportExporter().export(
+                output_path=export_path,
+                original_filename=saved_path.name,
+                cleaned_dataframe=cleaned_dataframe,
+                cleaning_summary=cleaning_summary,
+                analysis=analysis,
+                profile=profile,
+                detection=detection,
+                ai_insights=ai_insights,
+                chart_specs=chart_specs,
+            )
         except DatasetLoadError as exc:
             flash(str(exc))
             return redirect(url_for("upload_page"))
@@ -80,13 +99,29 @@ def create_app(config_object=DevelopmentConfig):
             detection=detection,
             charts=charts,
             ai_insights=ai_insights,
+            export_filename=export_filename,
             preview_html=preview_html,
+        )
+
+    @app.get("/download/<path:filename>")
+    def download_report(filename):
+        return send_from_directory(
+            app.config["EXPORT_FOLDER"],
+            filename,
+            as_attachment=True,
+            download_name=filename,
         )
 
     return app
 
 
 app = create_app()
+
+
+def self_contained_export_name(original_filename: str) -> str:
+    safe_stem = secure_filename(original_filename).rsplit(".", 1)[0] or "dataset"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{safe_stem}_bipilot_report_{timestamp}.xlsx"
 
 
 if __name__ == "__main__":

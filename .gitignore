@@ -17,6 +17,8 @@ database/*.sqlite3
 database/*.db
 datasets/*
 !datasets/.gitkeep
+exports/*
+!exports/.gitkeep
 note.txt
 
 # Build/export artifacts
