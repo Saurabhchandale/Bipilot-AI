@@ -14,7 +14,7 @@ from dataset_engine import (
     DatasetTypeDetector,
 )
 from dataset_engine.loader import DatasetLoadError
-from export_engine import ExcelReportExporter
+from export_engine import PDFReportExporter
 
 
 def create_app(config_object=DevelopmentConfig):
@@ -66,7 +66,7 @@ def create_app(config_object=DevelopmentConfig):
 
             export_filename = self_contained_export_name(saved_path.name)
             export_path = app.config["EXPORT_FOLDER"] / export_filename
-            ExcelReportExporter().export(
+            PDFReportExporter().export(
                 output_path=export_path,
                 original_filename=saved_path.name,
                 cleaned_dataframe=cleaned_dataframe,
@@ -121,7 +121,7 @@ app = create_app()
 def self_contained_export_name(original_filename: str) -> str:
     safe_stem = secure_filename(original_filename).rsplit(".", 1)[0] or "dataset"
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{safe_stem}_bipilot_report_{timestamp}.xlsx"
+    return f"{safe_stem}_bipilot_report_{timestamp}.pdf"
 
 
 if __name__ == "__main__":
