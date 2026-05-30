@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Dataset - Bipilot AI{% endblock %}
+
+{% block content %}
+<section class="upload-layout">
+    <div class="upload-copy">
+        <p class="eyebrow">AI Business Intelligence Assistant</p>
+        <h1>Bipilot AI</h1>
+        <p class="lead">Upload a CSV or Excel dataset and watch it become cleaned data, smart insights, and interactive dashboard visuals.</p>
+        <div class="flow-steps" aria-label="Analysis flow">
+            <span>Upload</span>
+            <span>Clean</span>
+            <span>Analyze</span>
+            <span>Visualize</span>
+        </div>
+    </div>
+
+    <form class="upload-panel" action="{{ url_for('analyze_dataset') }}" method="post" enctype="multipart/form-data">
+        <div>
+            <p class="panel-kicker">Start Analysis</p>
+            <h2>Dataset Upload</h2>
+        </div>
+        <label class="file-field" for="dataset">
+            <span class="file-title">Dataset file</span>
+            <input id="dataset" name="dataset" type="file" accept=".csv,.xls,.xlsx" required>
+        </label>
+        <button class="primary-button" type="submit">Analyze Dataset</button>
+    </form>
+</section>
+{% endblock %}

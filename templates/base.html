@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Bipilot AI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <canvas id="flow-background" aria-hidden="true"></canvas>
+    <div class="background-veil" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <a class="brand" href="{{ url_for('upload_page') }}">
+            <span class="brand-mark">BI</span>
+            <span>Bipilot AI</span>
+        </a>
+        <nav class="topbar-actions" aria-label="Application status">
+            <span class="status-pill">AI Dashboard Engine</span>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <section class="alert-list">
+                    {% for message in messages %}
+                        <div class="alert">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+    <script type="module" src="{{ url_for('static', filename='js/flow-background.js') }}"></script>
+</body>
+</html>

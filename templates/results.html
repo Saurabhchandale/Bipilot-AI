@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Bipilot AI{% endblock %}
+
+{% block content %}
+<section class="result-header">
+    <div>
+        <p class="eyebrow">Analysis Report</p>
+        <h1>{{ filename }}</h1>
+    </div>
+    <a class="secondary-button" href="{{ url_for('upload_page') }}">New Analysis</a>
+</section>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>Dataset Type</span>
+        <strong>{{ detection.detected_type }}</strong>
+        <small>{{ detection.confidence }}% confidence</small>
+    </article>
+    <article class="metric-card">
+        <span>Rows</span>
+        <strong>{{ analysis.metadata.row_count }}</strong>
+        <small>{{ cleaning_summary.original_shape[0] }} before cleaning</small>
+    </article>
+    <article class="metric-card">
+        <span>Columns</span>
+        <strong>{{ analysis.metadata.column_count }}</strong>
+        <small>{{ analysis.columns.numeric|length }} numeric</small>
+    </article>
+    <article class="metric-card">
+        <span>Duplicates Removed</span>
+        <strong>{{ cleaning_summary.duplicate_rows_removed }}</strong>
+        <small>{{ analysis.metadata.total_missing_values }} missing values remain</small>
+    </article>
+</section>
+
+<section class="content-grid">
+    <article class="panel">
+        <h2>Detected Columns</h2>
+        <dl class="summary-list">
+            <dt>Numeric</dt>
+            <dd>{{ analysis.columns.numeric|join(", ") or "None" }}</dd>
+            <dt>Categorical</dt>
+            <dd>{{ analysis.columns.categorical|join(", ") or "None" }}</dd>
+            <dt>Date</dt>
+            <dd>{{ analysis.columns.datetime|join(", ") or "None" }}</dd>
+            <dt>Currency</dt>
+            <dd>{{ analysis.columns.currency|join(", ") or "None" }}</dd>
+            <dt>Percentage</dt>
+            <dd>{{ analysis.columns.percentage|join(", ") or "None" }}</dd>
+        </dl>
+    </article>
+
+    <article class="panel">
+        <h2>Recommended KPIs</h2>
+        <ul class="clean-list">
+            {% for kpi in detection.recommended_kpis %}
+                <li>{{ kpi }}</li>
+            {% else %}
+                <li>No KPI pattern detected yet.</li>
+            {% endfor %}
+        </ul>
+    </article>
+
+    <article class="panel">
+        <h2>Recommended Charts</h2>
+        <ul class="clean-list">
+            {% for chart in detection.recommended_charts %}
+                <li>{{ chart }}</li>
+            {% endfor %}
+        </ul>
+    </article>
+
+    <article class="panel">
+        <h2>Cleaning Summary</h2>
+        <dl class="summary-list">
+            <dt>Final Shape</dt>
+            <dd>{{ cleaning_summary.final_shape[0] }} rows, {{ cleaning_summary.final_shape[1] }} columns</dd>
+            <dt>Date Conversions</dt>
+            <dd>{{ cleaning_summary.date_columns_converted|join(", ") or "None" }}</dd>
+            <dt>Numeric Conversions</dt>
+            <dd>{{ cleaning_summary.numeric_columns_converted|join(", ") or "None" }}</dd>
+        </dl>
+    </article>
+</section>
+
+<section class="ai-insight-panel">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">AI Insights</p>
+            <h2>Business Explanation</h2>
+        </div>
+        <span>{{ ai_insights.provider|upper }}</span>
+    </div>
+
+    {% if ai_insights.provider_note %}
+        <div class="alert">{{ ai_insights.provider_note }}</div>
+    {% endif %}
+
+    <p class="insight-summary">{{ ai_insights.summary }}</p>
+
+    <div class="insight-grid">
+        <article>
+            <h3>Key Findings</h3>
+            <ul class="clean-list">
+                {% for item in ai_insights.key_findings %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article>
+            <h3>Risks</h3>
+            <ul class="clean-list">
+                {% for item in ai_insights.risks %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article>
+            <h3>Recommendations</h3>
+            <ul class="clean-list">
+                {% for item in ai_insights.recommendations %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+    </div>
+</section>
+
+<section class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Auto Dashboard</p>
+            <h2>Recommended Visuals</h2>
+        </div>
+        <span>{{ charts|length }} charts</span>
+    </div>
+
+    <div class="chart-grid">
+        {% for chart in charts %}
+            <article class="chart-panel">
+                {% if chart.description %}
+                    <p>{{ chart.description }}</p>
+                {% endif %}
+                {% if chart.html %}
+                    {{ chart.html|safe }}
+                {% else %}
+                    <div class="empty-chart">{{ chart.description }}</div>
+                {% endif %}
+            </article>
+        {% else %}
+            <article class="chart-panel">
+                <div class="empty-chart">No chart could be generated from this dataset yet.</div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="panel full-width">
+    <h2>Null Analysis</h2>
+    <div class="table-wrap">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Column</th>
+                    <th>Missing Count</th>
+                    <th>Missing Percent</th>
+                    <th>Unique Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for column, nulls in profile.null_analysis.items() %}
+                    <tr>
+                        <td>{{ column }}</td>
+                        <td>{{ nulls.missing_count }}</td>
+                        <td>{{ nulls.missing_percent }}%</td>
+                        <td>{{ profile.unique_values[column].unique_count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel full-width">
+    <h2>Outlier Detection</h2>
+    <div class="table-wrap">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Column</th>
+                    <th>Outliers</th>
+                    <th>Percent</th>
+                    <th>Lower Bound</th>
+                    <th>Upper Bound</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for column, outlier in profile.outliers.items() %}
+                    <tr>
+                        <td>{{ column }}</td>
+                        <td>{{ outlier.outlier_count }}</td>
+                        <td>{{ outlier.outlier_percent }}%</td>
+                        <td>{{ outlier.lower_bound }}</td>
+                        <td>{{ outlier.upper_bound }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">No numeric outlier profile available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel full-width">
+    <h2>Data Preview</h2>
+    <div class="table-wrap">
+        {{ preview_html|safe }}
+    </div>
+</section>
+{% endblock %}
