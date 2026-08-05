@@ -37,7 +37,6 @@ OPENAI_MODEL=gpt-4o-mini
 ```
 
 Or for Gemini:
-
 ```env
 AI_PROVIDER=gemini
 GEMINI_API_KEY=your_gemini_key_here
