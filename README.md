@@ -13,6 +13,7 @@ Bipilot AI is an AI-powered dataset analysis and dashboard generation platform b
 - Generate AI-style business insights with local fallback or optional API providers
 - Modern 3D animated dashboard UI
 
+
 ## Setup
 
 ```powershell
