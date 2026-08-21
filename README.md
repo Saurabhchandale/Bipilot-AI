@@ -9,7 +9,7 @@ Bipilot AI is an AI-powered dataset analysis and dashboard generation platform b
 - Detect numeric, categorical, datetime, currency, and percentage columns
 - Profile nulls, unique values, outliers, correlations, and distributions
 - Detect dataset type such as Sales, Finance, HR, Marketing, Inventory, and Insurance
-- Generate automatic Plotly dashboard visuals
+- Generate automatic Plotly dashboard visuals            
 - Generate AI-style business insights with local fallback or optional API providers
 - Modern 3D animated dashboard UI
 
