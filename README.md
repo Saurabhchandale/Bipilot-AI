@@ -44,5 +44,5 @@ GEMINI_API_KEY=your_gemini_key_here
 GEMINI_MODEL=gemini-1.5-flash
 ```
 
-Without API keys, Bipilot AI uses the built-in local insight generator.
+Without API keys, AI use built-in local insight generator.
 
