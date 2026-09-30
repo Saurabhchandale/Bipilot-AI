@@ -27,7 +27,7 @@ Open:
 http://127.0.0.1:5000
 ```
 
-## Optional AI Configuration
+## Optional AI Configuration 
 
 Create a `.env` file for OpenAI:
 
