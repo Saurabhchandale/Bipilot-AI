@@ -3,7 +3,7 @@
 Bipilot AI is an AI-powered dataset analysis and dashboard generation platform built with Flask, Pandas, Plotly, and optional OpenAI/Gemini integrations. 
 
 ## Features
-
+ 
 - Upload CSV and Excel datasets
 - Clean duplicates, missing values, dates, and numeric columns
 - Detect numeric, categorical, datetime, currency, and percentage columns
