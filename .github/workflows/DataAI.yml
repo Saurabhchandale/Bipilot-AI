@@ -1,1 +1,43 @@
 
+name : CICD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code onto the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up the required environment runtime
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Step 3: Install dependencies and execute scripts
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step 4: Run test blocks
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test  # Ensures deployment only runs if build-and-test passes
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Deploy to Cloud Provider
+        run: echo "Executing deployment commands..."
+
+    
