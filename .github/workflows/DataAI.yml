@@ -1,5 +1,5 @@
 
-name: CICD
+name: BiPilot AI - CI Pipeline
 
 on:
   push:
@@ -11,58 +11,48 @@ permissions:
   contents: read
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  test:
+    name: Validate Python Application
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Download repository code
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Install Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set Up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: "20"
-          cache: npm
+          python-version: "3.12"
 
-      # 3. Install exact dependencies from package-lock.json
       - name: Install Dependencies
-        run: npm ci
-
-      # 4. Run tests if a test script exists
-      - name: Run Tests
         run: |
-          if node -e "process.exit(require('./package.json').scripts?.test ? 0 : 1)"; then
-            npm test
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          elif [ -f backend/requirements.txt ]; then
+            pip install -r backend/requirements.txt
           else
-            echo "No test script found. Skipping tests."
+            echo "No requirements.txt found"
+            exit 1
+          fi
+          pip install pytest
+
+      - name: Check Python Syntax
+        run: |
+          python -m compileall -q .
+
+      - name: Run Automated Tests
+        run: |
+          if [ -d tests ]; then
+            pytest tests/ -v
+          elif [ -d backend/tests ]; then
+            pytest backend/tests/ -v
+          elif [ -d __tests__ ]; then
+            pytest __tests__/ -v
+          else
+            echo "No recognized test directory found."
+            echo "Add automated tests to enable test validation."
           fi
 
-      # 5. Build the application
-      - name: Build Application
-        run: npm run build
-
-      # 6. Save the production build
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-build
-          path: dist/
-          if-no-files-found: error
-
-  deploy:
-    name: Deployment Placeholder
-    runs-on: ubuntu-latest
-    needs: build-and-test
-
-    # Run only after a successful push to main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Deployment Status
-        run: |
-          echo "CI passed successfully."
-          echo "Production build artifact is available."
-          echo "Connect a deployment provider to publish the app."
+      - name: CI Success
+        run: echo "BiPilot AI validation completed."
